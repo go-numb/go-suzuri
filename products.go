@@ -2,6 +2,7 @@ package suzuri
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -105,27 +106,27 @@ func (p *Client) GetProducts(userID, itemID, materialID, userName string) (*Resp
 
 type ParamsForCreate struct {
 	// Required
-	Texture string `json:"texture"`
-	Title   string `json:"title"`
+	Texture string `json:"texture,omitempty"`
+	Title   string `json:"title,omitempty"`
 
 	// Options
-	Price       int       `json:"price"`
-	Description string    `json:"description"`
-	Products    []Product `json:"products"`
+	Price       int       `json:"price,omitempty"`
+	Description string    `json:"description,omitempty"`
+	Products    []Product `json:"products,omitempty"`
 }
 
 type Product struct {
-	ItemID                 int           `json:"itemId"`
-	ExemplaryItemVariantID int           `json:"exemplaryItemVariantId"`
-	Published              bool          `json:"published"`
-	ResizeMode             string        `json:"resizeMode"`
+	ItemID                 int           `json:"itemId,omitempty"`
+	ExemplaryItemVariantID int           `json:"exemplaryItemVariantId,omitempty"`
+	Published              bool          `json:"published,omitempty"`
+	ResizeMode             string        `json:"resizeMode,omitempty"`
 	SubMaterials           []SubMaterial `json:"sub_materials,omitempty"`
 }
 
 type SubMaterial struct {
-	Texture   string `json:"texture"`
-	PrintSide string `json:"printSide"`
-	Enabled   bool   `json:"enabled"`
+	Texture   string `json:"texture,omitempty"`
+	PrintSide string `json:"printSide,omitempty"`
+	Enabled   bool   `json:"enabled,omitempty"`
 }
 
 type ResponseFromCreate struct {
@@ -161,10 +162,10 @@ type ResponseFromCreate struct {
 		URL            string    `json:"url,omitempty"`
 		SampleURL      string    `json:"sampleUrl,omitempty"`
 		Item           struct {
-			ID           int    `json:"id,omitempty"`
-			Name         string `json:"name,omitempty"`
-			Angles       []int  `json:"angles,omitempty"`
-			HumanizeName string `json:"humanizeName,omitempty"`
+			ID           int           `json:"id,omitempty"`
+			Name         string        `json:"name,omitempty"`
+			Angles       []interface{} `json:"angles,omitempty"`
+			HumanizeName string        `json:"humanizeName,omitempty"`
 		} `json:"item,omitempty"`
 		Material struct {
 			ID             int       `json:"id,omitempty"`
@@ -210,7 +211,8 @@ func (p *Client) NewMaterial(title, filename string, toribun int, items []Item) 
 	for i, item := range items {
 		products[i].ItemID = item.ID
 		products[i].Published = true
-		products[i].ExemplaryItemVariantID = 151
+		// products[i].ResizeMode = "contain"
+		// products[i].ExemplaryItemVariantID = 151
 		// products[i].SubMaterials = []SubMaterial{SubMaterial{Enabled: false}}
 	}
 
@@ -226,10 +228,12 @@ func (p *Client) NewMaterial(title, filename string, toribun int, items []Item) 
 
 // Create 指定画像で商品群を登録
 func (p *Client) Create(params *ParamsForCreate) (*ResponseFromCreate, error) {
-	body, err := json.Marshal(*params)
+	body, err := json.Marshal(params)
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Printf("%+v\n", string(body))
 
 	req, err := p.request(
 		http.MethodPost,
