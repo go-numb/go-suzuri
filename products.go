@@ -2,7 +2,6 @@ package suzuri
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -232,8 +231,6 @@ func (p *Client) Create(params *ParamsForCreate) (*ResponseFromCreate, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Printf("%+v\n", string(body))
 
 	req, err := p.request(
 		http.MethodPost,
