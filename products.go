@@ -248,3 +248,39 @@ func (p *Client) Create(params *ParamsForCreate) (*ResponseFromCreate, error) {
 
 	return s, nil
 }
+
+// CreateByText 指定画像で商品群を登録
+func (p *Client) CreateByText(text string) (*ResponseFromCreate, error) {
+	l := len([]rune(text))
+	if l > 254 {
+		text = string([]rune(text)[:254])
+	}
+	// Limit text num 255
+	var m = make(map[string]string)
+	m["text"] = text
+	// val.Set("itemVariantId", "1")
+	body, err := json.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+
+	// fmt.Printf("%+v\n", string(body))
+
+	req, err := p.request(
+		http.MethodPost,
+		"materials/text",
+		body,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// fmt.Printf("%+v\n", req)
+
+	var s = new(ResponseFromCreate)
+	if err := p.do(req, s); err != nil {
+		return nil, err
+	}
+
+	return s, nil
+}

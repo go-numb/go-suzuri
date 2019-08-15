@@ -34,6 +34,17 @@ func main() {
 	if err := c.Create(material); err != nil {
 		log.Error(err)
 	}
+
+
+	/*
+		# For only text
+	*/
+	p, err := c.CreateByText("SUZURI 完全に理解した")
+	if err != nil {
+		log.Error(err)
+	}
+
+	fmt.Printf("%+v\n", p)
     
 }
 ```
